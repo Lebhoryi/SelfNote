@@ -32,7 +32,7 @@ def create_path(paths):
 def index(request):
 
     if request.is_ajax():
-
+        pass
 
     paths = []
     fold_obj = Fold.objects.filter(user=request.user)
