@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}<title>login</title>{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    {% for err in  form.non_field_errors  %}
+    <div class="alert alert-danger" role="alert">{{ err }}</div>
+    {% endfor %}
+
+    <form class="form-horizontal" action="" method="post">
+
+        <div class="form-group">
+            <label class="col-md-5 control-label" id="{{ form.username.id_for_label }}" data-toggle="popover">Email/Username:</label>
+            <div class="col-md-3">
+              <input type="text" class="form-control" name="{{ form.username.html_name }}" placeholder="Email/Username" data-toggle="popover" data-content="">
+            </div>
+            <div class="col-md-4">
+            <a id="{{ form.username.html_name }}" data-toggle="popover" data-content=""></a>
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <label class="col-md-5 control-label" id="{{ form.password.id_for_label }}">Password:</label>
+            <div class="col-md-3">
+            <input type="password" class="form-control" name="{{ form.password.html_name }}" placeholder="Password" >
+            </div>
+            <div class="col-md-4">
+            <a id="{{ form.password.html_name }}" data-toggle="popover" data-content=""></a>
+            </div>
+        </div>
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="col-md-offset-5 col-md-3">
+                <button type="submit" class="btn btn-default">login</button>
+            </div>
+
+        </div>
+
+    </form>
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+    $(function () {
+          $('[data-toggle="popover"]').popover()
+        });
+    
+    $(document).ready(function () {
+        var msg = "";
+        {% for err in  form.username.errors  %}
+            msg = msg + "{{ err }}"+"\n";
+        {% endfor %}
+         $('#{{ form.username.html_name }}').attr("data-content",msg);
+        $('#{{ form.username.html_name }}').popover("show");
+
+        msg = "";
+        {% for err in  form.password.errors  %}
+            msg = msg + "{{ err }}"+"\n";
+        {% endfor %}
+        $('#{{ form.password.html_name }}').attr("data-content",msg);
+        $('#{{ form.password.html_name }}').popover("show");
+
+    })
+    </script>
+{% endblock %}
