@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
+{% load show_folds %}
 
 {% block style %}
 {% endblock %}
 
 {% block content %}
+
     <div class="row">
         <div class="col-md-3 col-sm-3"  >
             <div class=" main-fold">
@@ -14,25 +16,15 @@
                         <div class=" col-md-10 col-sm-10"><input type="text" class="form-control" placeholder="search"></div>
                     </form>
                 </div>
+            {% deal_fold folds as show_folds %}
+            {% for level,offset,fold in show_folds %}
                 <div class="row">
                     <a href="#">
-                        <div class="col-md-2 col-sm-2 fold-brand"><span class="glyphicon glyphicon-folder-open"></span></div>
-                        <div class="col-md-10 col-sm-10 fold-name">FOLD</div>
-                    </a>
-
-                </div>
-                <div class="row">
-                    <a href="#">
-                        <div class="col-md-3 col-sm-3 fold-brand"><span class="glyphicon glyphicon-folder-open"></span></div>
-                        <div class="col-md-9 col-sm-9 fold-name">FOLD-children</div>
+                        <div class="col-md-{{ level | add:1 }} col-sm-{{ level | add:1 }} fold-brand"><span class="glyphicon glyphicon-folder-open"></span></div>
+                        <div class="col-md-{{ offset | add:-1 }} col-sm-{{ offset | add:-1 }} fold-name">{{ fold }}</div>
                     </a>
                 </div>
-                <div class="row">
-                    <a href="#">
-                        <div class="col-md-2 col-sm-2 fold-brand"><span class="glyphicon glyphicon-folder-open"></span></div>
-                        <div class="col-md-10 col-sm-10 fold-name">FOLD2</div>
-                    </a>
-                </div>
+            {% endfor %}
             </div>
         </div>
         <div class="col-md-3 col-sm-3 " >

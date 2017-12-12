@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser , BaseUserManager, PermissionsMixin
 # Create your models here.
+from site import check_enableusersite
 
 
 class MyUserManager(BaseUserManager):
@@ -76,7 +77,7 @@ class File(models.Model):
         return self.file
 
 
-class Fold(models.Model):
+class Fold(models.Model):   #Check if name exists
     #文件夹表
     user = models.ForeignKey('User',on_delete=models.CASCADE)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
