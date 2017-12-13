@@ -2,19 +2,24 @@ from django import template
 
 register = template.Library()
 
-def jsontolist_path(path,level,folds):
+def jsontolist_path(paths,level,folds,path):
     level = level + 1
+
     if isinstance(folds,dict):
         for fold,sub in folds.items():
-            path.append((level,12-level,fold))
-            jsontolist_path(path,level,sub)
+            if fold == "YmFzZQ==":
+                pass
+            else:
+                paths.append((level,12-level,fold, path+'/' +fold))
+                jsontolist_path(paths,level,sub, path+'/' +fold)
 
-    return path
+    return paths
 
 @register.simple_tag
 def deal_fold(folds):
-    path = []
+    path = ""
+    paths = []
     level = 0
-    return jsontolist_path(path,level,folds)
+    return jsontolist_path(paths,level,folds,path)
 
 

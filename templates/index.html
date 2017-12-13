@@ -17,9 +17,10 @@
                     </form>
                 </div>
             {% deal_fold folds as show_folds %}
-            {% for level,offset,fold in show_folds %}
+
+            {% for level,offset,fold,path in show_folds %}
                 <div class="row">
-                    <a href="#">
+                    <a id="{{ path }}" onclick="get_note(this)" href="#">
                         <div class="col-md-{{ level | add:1 }} col-sm-{{ level | add:1 }} fold-brand"><span class="glyphicon glyphicon-folder-open"></span></div>
                         <div class="col-md-{{ offset | add:-1 }} col-sm-{{ offset | add:-1 }} fold-name">{{ fold }}</div>
                     </a>
@@ -30,32 +31,6 @@
         <div class="col-md-3 col-sm-3 " >
             <div class="main-list">
                 <ul class="list-group">
-                    <li class="list-group-item">
-                        <h5 class="title"><span class="glyphicon glyphicon-menu-hamburger"></span> arm</h5>
-                        <p class="content">content content content content content content content content content content content content contentcontent content content content content content content content content content content content12</p>
-                        <p class="time">2017-12-10</p>
-                    </li>
-                    <li class="list-group-item">
-                        <h5 class="title"><span class="glyphicon glyphicon-menu-hamburger"></span> python</h5>
-                        <p class="content">content</p>
-                        <p class="time">2017-12-10</p>
-                    </li>
-                    <li class="list-group-item">
-                        <h5 class="title"><span class="glyphicon glyphicon-menu-hamburger"></span> linux</h5>
-                        <p class="content"> content</p>
-                        <p class="time">2017-12-10</p>
-                    </li>
-                    <li class="list-group-item">
-                        <h5 class="title"><span class="glyphicon glyphicon-menu-hamburger"></span> stm32</h5>
-                        <p class="content">content</p>
-                        <p class="time">2017-12-10</p>
-                    </li>
-                    <li class="list-group-item">
-
-                        <h5 class="title"><span class="glyphicon glyphicon-menu-hamburger"></span> c</h5>
-                        <p class="content">content</p>
-                        <p class="time">2017-12-10</p>
-                    </li>
 
                 </ul>
             </div>
@@ -104,6 +79,17 @@
                 $("#editor-iframe").css("display", "block");
             },500);
         });
+
+
+        function get_note(e) {
+            console.log(e.id);
+            $.ajax({
+                url: "?path="+String(e.id),
+                success:function (note) {
+                    $(".main-list ul").html(note)
+                }
+            });
+        }
     </script>
 
 {% endblock %}

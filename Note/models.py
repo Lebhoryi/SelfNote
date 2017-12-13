@@ -57,12 +57,12 @@ class Note(models.Model):
     # 笔记表
     fold = models.ForeignKey('Fold',on_delete=models.CASCADE)
     name = models.CharField(max_length=64)
-    content = models.TextField()
+    content = models.TextField(blank=True,null=True)
     update_date = models.DateTimeField(auto_now_add=True)
     create_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.fold
+        return self.name
 
 def file_path(instance, filename):
     return 'attachment/{0}/{1}'.format(instance.note, filename)
