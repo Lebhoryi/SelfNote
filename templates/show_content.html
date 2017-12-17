@@ -1,0 +1,11 @@
+
+<div class="panel-heading"><h3>{{ content.name }}</h3></div>
+<div class="list-group">
+    {% if not files %}
+        <div class="list-group-item">don't exist attachment</div>
+    {% endif %}
+    {% for file in files %}
+        <div class="list-group-item">{{ file.file }}</div>
+    {% endfor %}
+</div>
+<div class="panel-body">{{ content.content }}</div>

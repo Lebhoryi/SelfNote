@@ -1,5 +1,5 @@
 {% for note in notes %}
-<li class="list-group-item">
+<li id="{{ note.id }}" onclick="get_content(this)" class="list-group-item">
     <h5 class="title"><span class="glyphicon glyphicon-menu-hamburger"></span> {{ note.name }}</h5>
     <p class="content">{{ note.content }}</p>
     <p class="time">{{ note.create_date | date:"o-m-j"}}</p>
