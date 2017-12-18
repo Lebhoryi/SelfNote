@@ -21,19 +21,20 @@ def get_path(fold):
     return path
 
 
-def find_path_obj(user,old_path):
+def find_path_obj(user, old_path):
     path = []
     while len(old_path) > 1:
         old_path, tmp = path_split(old_path)
         path.append(tmp)
 
-    del_fold = Fold.objects.filter(user=user,name=path.pop())
+    del_fold = Fold.objects.filter(user=user, name=path.pop())
     print(path)
     while len(path):
         del_fold = del_fold[0]
         del_fold = del_fold.fold_set.filter(user=user, name=path.pop())
 
     return del_fold
+
 
 def delete_fold_obj(fold_objs):
     for fold_obj in fold_objs:
@@ -129,11 +130,32 @@ def update(request):
 
 @login_required
 def delete(request):
-    if request.is_ajax() and 'path' in request.GET.keys():
-        delete_fold_obj(find_path_obj(request.user,request.GET['path']))
+    if request.is_ajax():
+        if 'path' in request.GET.keys():
+            delete_fold_obj(find_path_obj(request.user, request.GET['path']))
+        elif 'note' in request.GET.keys():
+            Note.objects.get(id=request.GET['note']).delete()
     return HttpResponse('ok')
 
 
 @login_required
 def create(request):
+    if request.is_ajax():
+        if 'path' in request.GET.keys():
+            print(request.GET)
+            path = find_path_obj(request.user, request.GET['path'])[0]
+            print(path)
+            name = request.GET['name']
+            for sub in path.fold_set.all():
+                if name == sub.name:
+                    return HttpResponse('fail')
+            if name:
+                Fold(user=request.user, parent=path, name=name).save()
+        elif 'note' in request.GET.keys():
+            path = find_path_obj(request.user, request.GET['note'])[0]
+            name = request.GET['name']
+            print(name)
+            if name:
+                Note(fold=path, name=name).save()
+
     return HttpResponse('ok')

@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser , BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 # Create your models here.
 from site import check_enableusersite
 
@@ -14,6 +14,7 @@ class MyUserManager(BaseUserManager):
         user = self.model(username=username, password=password, email=email)
         user.set_password(password)
         user.save()
+        Fold(user=user, name='Root').save()
         return user
 
     def create_user(self, username, email, password, **extra_field):
@@ -29,7 +30,7 @@ class MyUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
 
-    username = models.CharField(max_length=32,unique=True)
+    username = models.CharField(max_length=32, unique=True)
     email = models.EmailField(verbose_name="email address", unique=True)
     password = models.CharField(max_length=32)
     date_join = models.DateTimeField(auto_now=True)
@@ -55,33 +56,45 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Note(models.Model):
     # 笔记表
-    fold = models.ForeignKey('Fold',on_delete=models.CASCADE)
+    fold = models.ForeignKey('Fold', on_delete=models.CASCADE)
     name = models.CharField(max_length=64)
-    content = models.TextField(blank=True,null=True)
+    content = models.TextField(blank=True, null=True)
     update_date = models.DateTimeField(auto_now_add=True)
     create_date = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        unique_together = ('fold', 'name')
+
+
     def __str__(self):
         return self.name
+
 
 def file_path(instance, filename):
     return 'attachment/{0}/{1}'.format(instance.note, filename)
 
 
 class File(models.Model):
-    #附件表
+    # 附件表
     note = models.ForeignKey('Note', on_delete=models.CASCADE)
     file = models.FileField(upload_to=file_path)
+
+    class Meta:
+        unique_together = ('note', 'file')
 
     def __str__(self):
         return self.file
 
 
-class Fold(models.Model):   #Check if name exists
-    #文件夹表
-    user = models.ForeignKey('User',on_delete=models.CASCADE)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+class Fold(models.Model):  # Check if name exists
+    # 文件夹表
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    parent = models.ForeignKey(
+        'self', on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=128)
+
+    class Meta:
+        unique_together = ('parent', 'name')
 
     def __str__(self):
         return self.name

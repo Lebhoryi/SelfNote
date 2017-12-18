@@ -39,21 +39,25 @@
             </div>
         </div>
         <div class="col-md-3 col-sm-3 " >
+            <button id="btn_note" class="btn btn-primary" data-backdrop="static" data-keyboard="" data-toggle="modal" data-target="#noteModal" style="position: absolute;">Add</button>
             <div class="main-list">
                 <ul class="list-group">
-
+                    <li  class="list-group-item">
+                    click fold first
+                    </li>
                 </ul>
             </div>
         </div>
 
         <div class="col-md-6 col-sm-6" >
-            <button id="editor" class="btn btn-primary" data-backdrop="static" data-keyboard="" data-toggle="modal" data-target="#editorModal" style="position: absolute;">edit</button>
+            <button id="editor" class="btn btn-primary" data-backdrop="static" data-keyboard="" data-toggle="modal" data-target="#editorModal" style="position: absolute;">Edit</button>
             <div class="main-content">
                 <div class="panel panel-default" >
                     <p style="text-align: center ">please open your note</p>
                 </div>
             </div>
         </div>
+
 
         <div class="modal fade bs-example-modal-lg" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog modal-lg" role="document">
@@ -70,12 +74,19 @@
             </div>
         </div>
 
-<div id="context-menu">
- <ul class="dropdown-menu" role="menu">  
-  <li><a tabindex="-1" href="#" operator="top">插入此行上面</a></li>  
-  <li><a tabindex="-1" href="#" operator="bottom">插入此行下面</a></li>  
- </ul>
-</div>
+        <div class="modal fade bs-example-modal-lg" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="noteModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+{#                    <div class="modal-header">#}
+{##}
+{#                    </div>#}
+                        <div class="input-group">
+                            <input id="input_note" type="text" class="form-control" placeholder="note name" aria-describedby="submit-addon">
+                            <span id="add_note" class="btn btn-default input-group-addon"  data-dismiss="modal" aria-label="Close">submit</span>
+                        </div>
+
+            </div>
+        </div>
 
 {% csrf_token %}
 {% endblock %}
@@ -90,7 +101,10 @@
 
 
     <script type="text/javascript">
-    $(".main-fold>.row").addClass('context-menu')
+    var menu_obj
+    var current_path
+
+   
     $(".main-fold>.row").hover(function(){
     $(this).addClass("active");
     },
@@ -98,8 +112,7 @@
         $(this).removeClass("active");
     })
 
-
-    var menu_obj
+    $(".main-fold>.row").addClass('context-menu')
     $(function() {
         $.contextMenu({
             selector: '.context-menu',
@@ -107,26 +120,53 @@
                 if(key in options.items)
                 {
                     if(key == "create"){
-                        ;
+                        menu_obj = $(".context-menu-active > a")
+                        $(".context-menu-active").after('<div class=\"input-group\"><input id=\"fold_input\" type=\"text\" class=\"form-control\" placeholder=\"Username\" aria-describedby=\"submit-addon\"><span class=\"input-group-addon btn btn-default \" id=\"submit-addon\" onclick=\"create_fold()\">submit</span></div>')
                     }
                     else if(key == "del"){
-                        menu_obj = $(".context-menu-active")
-                        delete_fold($(".context-menu-active > a").attr("id"))
+                        menu_obj = $(".context-menu-active > a")
+                        delete_fold()
                     }
                 }
-
                 var m = "clicked: " + key;
                 window.console && console.log(m) ;
             },
             items: {
                 "create": {name: "create" },
+                "sep1": "---------",
                 "del": {name: "del"},
             }
         });
 
-        $('.context-menu-one').on('click', function(e){
-            console.log('clicked', this);
-        })
+    });
+
+    $(function(){
+    　　t = setInterval(function(){
+        $(".main-list .list-group-item").addClass('note-menu')
+        }, 100);
+
+    })
+   
+    $(function() {
+        $.contextMenu({
+            selector: '.note-menu',
+            callback: function(key, options) {
+                if(key in options.items)
+                {
+                    if(key == "del"){
+                        menu_obj = $(".context-menu-active")
+                        delete_note()
+                    }
+
+                }
+                var m = "clicked: " + key;
+                window.console && console.log(m) ;
+            },
+            items: {
+                "del": {name: "del"},
+            }
+        });
+
     });
 
     </script>
@@ -154,12 +194,16 @@
         });
 
         function get_note(e) {
+            current_path=String(e.id);
 
             $.ajax({
                 url: "?path="+String(e.id),
                 success:function (note) {
-                    $(".main-list ul").html(note)
+                    $(".main-list ul").html(note);
                 }
+            })
+            .fail(function(){
+                $(".main-list ul").html("");
             });
         }
 
@@ -173,24 +217,51 @@
             });
         }
 
-        function delete_fold(id){
+        function delete_fold(){
             $.ajax({
-                url: "{% url 'delete' %}?path="+String(id),
+                url: "{% url 'delete' %}?path="+menu_obj.attr("id"),
                 success:function(response){
                     if(response == 'ok'){
-                        menu_obj.remove()
+                        // menu_obj.remove()
+                        window.location.reload();
                     }
                 }
             });
         }
-        function create_fold(e){
+        function create_fold(){
             $.ajax({
-                url: "{% url 'create' %}?path="+String(e.id),
+                url: "{% url 'create' %}?path="+menu_obj.attr("id")+"&name="+$("#fold_input")[0].value,
                 success:function(response){
-                    console.log("create");
+                    // console.log("create");
+                    window.location.reload();
                 }
-        });
+        });}
+
+        function delete_note(){
+            $.ajax({
+                url: "{% url 'delete' %}?note="+menu_obj.attr("id"),
+                success:function(response){
+                    if(response == 'ok'){
+                        // menu_obj.remove()
+                        window.location.reload();  
+                    }
+                }
+            });
+
+
         }
+
+        $("#add_note").click(function(event) {
+            $.ajax({
+                url: "{% url 'create' %}?note="+String(current_path)+"&name="+$("#input_note")[0].value,
+                success:function(response){
+                    if(response == 'ok'){
+                        // $(".main-list ul").html(note); //redisplay
+                        window.location.reload();
+                    }
+                }
+            });
+        });
     </script>
 
 
