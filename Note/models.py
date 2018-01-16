@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.urlresolvers import reverse
 # Create your models here.
 from site import check_enableusersite
 
@@ -98,3 +99,14 @@ class Fold(models.Model):  # Check if name exists
 
     def __str__(self):
         return self.name
+
+class Share(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    note = models.ForeignKey('Note', on_delete=models.CASCADE)
+    token = models.CharField(max_length=16)
+
+    def get_absoulte_url(self):
+        return reverse('share', args=(self.token,))
+
+    def __str__(self):
+        return self.token

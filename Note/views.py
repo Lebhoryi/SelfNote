@@ -159,3 +159,6 @@ def create(request):
                 Note(fold=path, name=name).save()
 
     return HttpResponse('ok')
+
+def share(request,token):
+    pass

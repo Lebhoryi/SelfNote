@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^create$', views.create, name='create'),
     url(r'^update$', views.update, name='update'),
     url(r'^delete$', views.delete, name='delete'),
+    url(r'^share/(?P<token>[\w+])', views.share, name='share'),
 ]
